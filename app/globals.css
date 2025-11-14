@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Remove background overrides so Tailwind can control it */
+
 :root {
   --foreground: #171717;
 }
@@ -8,10 +8,10 @@
 body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  background: transparent !important; /* Prevent dark mode from overriding */
+  background: transparent !important; 
 }
 
-/* Ensure full height for min-h-screen */
+
 html, body, #__next {
   height: 100%;
   width: 100%;

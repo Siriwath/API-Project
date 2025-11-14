@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Helper function to log the search
 async function logSearchedCity(cityName: string, pastName: string = "") {
   const connection = await mysql.createConnection({
     host: process.env.DB_HOST,
@@ -21,17 +20,15 @@ async function logSearchedCity(cityName: string, pastName: string = "") {
   await connection.end();
 }
 
-// GET request handler
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const cityName = url.searchParams.get("name"); // /api/search-city?name=Paris
+  const cityName = url.searchParams.get("name");
 
   if (!cityName) {
     return NextResponse.json({ error: "No city provided" }, { status: 400 });
   }
 
   try {
-    // 1️⃣ Fetch city info from OpenWeather
     const apiKey = process.env.API_KEY;
     const apiRes = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`
@@ -43,12 +40,15 @@ export async function GET(request: Request) {
 
     const cityData = await apiRes.json();
 
-    // 2️⃣ Log the search in MySQL
-    // If you want, you can pass a previous city as pastName, or leave empty
+    // Log search
     await logSearchedCity(cityName, "");
 
-    // 3️⃣ Return the API data to frontend
-    return NextResponse.json({ city: cityData });
+    // Return only the needed fields
+    return NextResponse.json({
+      name: cityData.name,
+      temp: cityData.main?.temp ?? 0,
+      description: cityData.weather?.[0]?.description ?? "N/A",
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
